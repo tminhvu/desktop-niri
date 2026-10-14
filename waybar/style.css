@@ -1,0 +1,190 @@
+* {
+  font-family: 'Noto Sans Mono', 'FontAwesome', 'Iosevka Nerd Font', monospace;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+window#waybar {
+  background-color: #0d1117;
+  color: #adbac7;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+window#waybar.termite {
+  background-color: #3F3F3F;
+}
+
+window#waybar.chromium {
+  background-color: #000000;
+  border: none;
+}
+
+button {
+  box-shadow: inset 0 -3px transparent;
+  border: none;
+  border-radius: 0;
+}
+
+#workspaces button {
+  padding: 0 5px 2px 5px;
+  /*
+  background-color: #22272e;
+  */
+  color: #ffffff;
+}
+
+#workspaces button.focused {
+  /*
+  background-color: #22272e;
+  */
+  box-shadow: inset 0 -3px #adbac7;
+}
+
+#workspaces button.urgent {
+  background-color: #22272e;
+}
+
+#mode {
+  background-color: #22272e;
+  box-shadow: inset 0 -3px #adbac7;
+  color: #adbac7;
+}
+
+/* Unified module styling */
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#wireplumber,
+#custom-media,
+#tray,
+#mode,
+#idle_inhibitor,
+#scratchpad,
+#power-profiles-daemon,
+#mpd,
+#language,
+#keyboard-state,
+#battery.charging,
+#battery.plugged,
+#battery.critical:not(.charging),
+#network.disconnected,
+#pulseaudio.muted,
+#wireplumber.muted,
+#temperature.critical,
+#power-profiles-daemon.performance,
+#power-profiles-daemon.balanced,
+#power-profiles-daemon.power-saver,
+#mpd.disconnected,
+#mpd.stopped,
+#mpd.paused,
+#custom-media.custom-spotify,
+#custom-media.custom-vlc,
+#idle_inhibitor.activated,
+#keyboard-state>label.locked,
+#privacy-item.screenshare,
+#privacy-item.audio-in,
+#privacy-item.audio-out,
+#tray,
+#privacy-item {
+  padding: 0 10px 2px 10px;
+  /*background-color: #22272e;
+  color: #adbac7;
+   * */
+  color: #ffffff;
+}
+
+/* Clock no longer has special background */
+#clock {
+  /*color: #6bc46d;*/
+  /*background-color: #0d1117;
+  background-color: #2ecc71;
+   * */
+  color: #ffffff;
+}
+
+/* Window & workspaces margin */
+#window,
+#workspaces {
+  margin: 0 4px;
+}
+
+.modules-left>widget:first-child>#workspaces {
+  margin-left: 0;
+}
+
+.modules-right>widget:last-child>#workspaces {
+  margin-right: 0;
+}
+
+#privacy-item {
+  padding: 0 5px;
+}
+
+/* Scratchpad */
+#scratchpad {
+  background-color: #22272e;
+}
+
+#scratchpad.empty {
+  background-color: transparent;
+}
+
+/* Language & keyboard */
+#language {
+  padding: 0 5px;
+  margin: 0 5px;
+  min-width: 16px;
+}
+
+#keyboard-state {
+  padding: 0 0px;
+  margin: 0 5px;
+  min-width: 16px;
+}
+
+#keyboard-state>label {
+  padding: 0 5px;
+}
+
+/* Power module - unified with your theme */
+#custom-power {
+  /*
+  background-color: #22272e;
+  color: #adbac7;
+  */
+  color: #ffffff;
+  padding: 0 0 2px 8px;
+  min-width: 20px;
+  /* Keeps it compact */
+}
+
+/* Style the popup menu to match (Gtk CSS) */
+menu menuitem {
+  /* Targets the popup items */
+  background-color: #22272e;
+  color: #adbac7;
+  padding: 5px 10px;
+}
+
+menu menuitem:hover {
+  background-color: #adbac7;
+  /* Subtle hover highlight */
+  color: #22272e;
+}
+
+menu separator {
+  background-color: #adbac7;
+  /* Line separator */
+  min-height: 1px;
+}

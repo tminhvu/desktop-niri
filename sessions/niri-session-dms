@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export NIRI_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/niri/config-dms.kdl"
+exec /usr/bin/niri-session "$@"

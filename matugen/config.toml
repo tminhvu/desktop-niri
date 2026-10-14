@@ -1,0 +1,5 @@
+[config]
+
+[templates.fuzzel]
+input_path = '~/.config/matugen/templates/fuzzel.ini'
+output_path = '~/.cache/niri-desktop/fuzzel-colors.ini'

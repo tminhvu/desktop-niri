@@ -1,0 +1,64 @@
+/* Force internal button boxes to align items vertically center */
+button box {
+    vertical-align: middle;
+    align-items: center;
+}
+
+/* Scale and normalize button icon sizes */
+button image {
+    /* -gtk-icon-transform: scale(1.3); /* Increases size slightly if too small */
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 4px;
+}
+/* Add internal padding to the button container to prevent text touching the border */
+button {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* Ensure a healthy gap specifically between the icon and the text */
+button box {
+    border-spacing: 2px;
+}
+
+VteTerminal,
+vte-terminal {
+  padding: 4px;
+}
+
+/* reduce padding of tabs */
+#xfce4-terminal-notebook tab {
+  min-height: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* reduce padding of buttons */
+#xfce4-terminal-notebook tab button {
+  min-height: 0;
+  min-width: 0;
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+#xfce4-terminal-notebook tab {
+  font-weight: bold;
+}
+
+/*
+#xfce4-terminal-notebook tab:checked {
+  font-weight: bold;
+  color: #789978;
+  min-height: 0;
+  min-width: 0;
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  background-color: #1D2021;
+  border-top-left-radius: 4;
+  border-top-right-radius: 4;
+}
+@import 'colors.css';
+*/

@@ -1,0 +1,5 @@
+// Niri session using Dank Material Shell instead of standalone shell components.
+include "base.kdl"
+
+spawn-sh-at-startup "/usr/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args '--xim'"
+spawn-at-startup "systemctl" "--user" "start" "--no-block" "dms.service"

@@ -1,0 +1,41 @@
+{
+  "name": "Niri Blue",
+  "dark": {
+    "primary": "#7fc8ff",
+    "primaryText": "#002f48",
+    "primaryContainer": "#0d47a1",
+    "secondary": "#8ab4f8",
+    "surface": "#101418",
+    "surfaceText": "#e0e2e8",
+    "surfaceVariant": "#42474e",
+    "surfaceVariantText": "#c2c7cf",
+    "surfaceTint": "#7fc8ff",
+    "background": "#101418",
+    "backgroundText": "#e0e2e8",
+    "outline": "#8c9199",
+    "surfaceContainerLowest": "#0c1014",
+    "surfaceContainerLow": "#191c20",
+    "surfaceContainer": "#1d2024",
+    "surfaceContainerHigh": "#272a2f",
+    "surfaceContainerHighest": "#32353a"
+  },
+  "light": {
+    "primary": "#00639a",
+    "primaryText": "#ffffff",
+    "primaryContainer": "#cce5ff",
+    "secondary": "#416277",
+    "surface": "#f7f9ff",
+    "surfaceText": "#181c20",
+    "surfaceVariant": "#dee3eb",
+    "surfaceVariantText": "#42474e",
+    "surfaceTint": "#00639a",
+    "background": "#f7f9ff",
+    "backgroundText": "#181c20",
+    "outline": "#72777f",
+    "surfaceContainerLowest": "#ffffff",
+    "surfaceContainerLow": "#eef0f6",
+    "surfaceContainer": "#eceef4",
+    "surfaceContainerHigh": "#e6e8ee",
+    "surfaceContainerHighest": "#e0e2e8"
+  }
+}
