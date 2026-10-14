@@ -9,7 +9,7 @@ input {
 
         numlock
         repeat-delay 350
-        repeat-rate 60
+        repeat-rate 80
     }
 
     touchpad {
