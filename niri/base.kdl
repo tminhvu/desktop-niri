@@ -431,12 +431,12 @@ binds {
 
     Mod+Page_Down      { focus-workspace-down; }
     Mod+Page_Up        { focus-workspace-up; }
-    Mod+U              { focus-workspace-down; }
-    Mod+I              { focus-workspace-up; }
+    Mod+U hotkey-overlay-title="Focus Workspace Down" { focus-workspace-down; }
+    Mod+I hotkey-overlay-title="Focus Workspace Up" { focus-workspace-up; }
     Mod+Shift+Page_Down { move-column-to-workspace-down; }
     Mod+Shift+Page_Up   { move-column-to-workspace-up; }
-    Mod+Shift+U         { move-column-to-workspace-down; }
-    Mod+Shift+I         { move-column-to-workspace-up; }
+    Mod+Shift+U hotkey-overlay-title="Move Column to Workspace Down" { move-column-to-workspace-down; }
+    Mod+Shift+I hotkey-overlay-title="Move Column to Workspace Up" { move-column-to-workspace-up; }
 
     // Alternatively, there are commands to move just a single window:
     // Mod+Ctrl+Page_Down { move-window-to-workspace-down; }
@@ -529,7 +529,7 @@ binds {
     //Mod+Shift+R { switch-preset-window-height; }
     //Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
-    Mod+Shift+F { fullscreen-window; }
+    Mod+Shift+F hotkey-overlay-title="Screenshot: Full Screen" { screenshot-screen; }
 
     // Expand the focused column to space not taken up by other fully visible columns.
     // Makes the column "fill the rest of the space".
@@ -557,7 +557,7 @@ binds {
 
     // Move the focused window between the floating and the tiling layout.
     Mod+S       { toggle-window-floating; }
-    Mod+Shift+S { switch-focus-between-floating-and-tiling; }
+    Mod+Shift+S hotkey-overlay-title="Screenshot: Select Area" { screenshot; }
 
     // Toggle tabbed column display mode.
     // Windows in this column will appear as vertical tabs,
@@ -572,10 +572,7 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Print { screenshot; }
-    Mod+Alt+S { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Mod+Shift+W hotkey-overlay-title="Screenshot: Focused Window" { screenshot-window; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
