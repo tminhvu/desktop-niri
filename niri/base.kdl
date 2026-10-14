@@ -529,6 +529,7 @@ binds {
     //Mod+Shift+R { switch-preset-window-height; }
     //Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
+    Mod+Alt+F hotkey-overlay-title="Fullscreen Focused Window" { fullscreen-window; }
     Mod+Shift+F hotkey-overlay-title="Screenshot: Full Screen" { screenshot-screen; }
 
     // Expand the focused column to space not taken up by other fully visible columns.
@@ -557,6 +558,7 @@ binds {
 
     // Move the focused window between the floating and the tiling layout.
     Mod+S       { toggle-window-floating; }
+    Mod+Alt+S hotkey-overlay-title="Switch Focus Between Floating and Tiling" { switch-focus-between-floating-and-tiling; }
     Mod+Shift+S hotkey-overlay-title="Screenshot: Select Area" { screenshot; }
 
     // Toggle tabbed column display mode.
