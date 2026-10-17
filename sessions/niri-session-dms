@@ -1,4 +1,8 @@
 #!/bin/sh
 
 export NIRI_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/niri/config-dms.kdl"
+export XMODIFIERS="@im=fcitx"
+export QT_IM_MODULE="fcitx"
+export QT_IM_MODULES="wayland;fcitx;ibus"
+export SDL_IM_MODULE="fcitx"
 exec /usr/bin/niri-session "$@"

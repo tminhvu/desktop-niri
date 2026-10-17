@@ -2,14 +2,22 @@
 // https://yalter.github.io/niri/Configuration:-Introduction
 // https://yalter.github.io/niri/Configuration:-Input
 prefer-no-csd
+environment {
+    XMODIFIERS "@im=fcitx"
+    QT_IM_MODULE "fcitx"
+    QT_IM_MODULES "wayland;fcitx;ibus"
+    SDL_IM_MODULE "fcitx"
+}
+
 input {
     keyboard {
         xkb {
+            options "caps:escape"
         }
 
         numlock
         repeat-delay 350
-        repeat-rate 80
+        repeat-rate 60
     }
 
     touchpad {

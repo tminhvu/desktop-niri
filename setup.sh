@@ -154,15 +154,14 @@ install_packages() {
   run sudo add-apt-repository -y universe
   run sudo add-apt-repository -y ppa:avengemedia/danklinux
   run sudo add-apt-repository -y ppa:avengemedia/dms
-  run sudo add-apt-repository -y ppa:bamboo-engine/ibus-bamboo
   run sudo apt-get update
   run sudo apt-get install -y \
     niri dms matugen waybar fuzzel swaybg swaylock xwayland-satellite \
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
     wireplumber brightnessctl pavucontrol power-profiles-daemon network-manager-gnome \
     xfce4-terminal lxpolkit \
-    ibus ibus-gtk ibus-gtk3 ibus-gtk4 ibus-bamboo \
-    keyd fonts-noto fonts-noto-mono fonts-font-awesome
+    fcitx5 fcitx5-bamboo fcitx5-frontend-all fcitx5-frontend-gtk2 fcitx5-config-qt \
+    python3-evdev fonts-noto fonts-noto-mono fonts-font-awesome
 }
 
 install_iosevka_nerd_font() {
@@ -213,6 +212,7 @@ install_user_configs() {
   install_user_file \
     "$REPO_DIR/desktop-config/xfce4-terminal.xml" \
     "$CONFIG_HOME/xfce4/xfconf/xfce-perchannel-xml/xfce4-terminal.xml"
+  install_user_file "$REPO_DIR/desktop-config/gtkrc-2.0" "$HOME/.gtkrc-2.0"
   install_user_file "$REPO_DIR/desktop-config/gtk-3.0/gtk.css" "$CONFIG_HOME/gtk-3.0/gtk.css"
   install_user_file "$REPO_DIR/desktop-config/gtk-3.0/settings.ini" "$CONFIG_HOME/gtk-3.0/settings.ini"
   install_user_file "$REPO_DIR/desktop-config/gtk-4.0/settings.ini" "$CONFIG_HOME/gtk-4.0/settings.ini"
@@ -220,25 +220,16 @@ install_user_configs() {
     "$REPO_DIR/desktop-config/fontconfig/20-no-embedded.conf" \
     "$CONFIG_HOME/fontconfig/conf.d/20-no-embedded.conf"
 
-  log "Installing IBus Bamboo configuration"
+  log "Installing Fcitx 5 Bamboo configuration"
   install_user_file \
-    "$REPO_DIR/desktop-config/ibus-bamboo/ibus-bamboo.config.json" \
-    "$CONFIG_HOME/ibus-bamboo/ibus-bamboo.config.json"
+    "$REPO_DIR/desktop-config/fcitx5/config" \
+    "$CONFIG_HOME/fcitx5/config"
   install_user_file \
-    "$REPO_DIR/desktop-config/ibus-bamboo/ibus-bamboo.macro.text" \
-    "$CONFIG_HOME/ibus-bamboo/ibus-bamboo.macro.text"
+    "$REPO_DIR/desktop-config/fcitx5/profile" \
+    "$CONFIG_HOME/fcitx5/profile"
   install_user_file \
-    "$REPO_DIR/desktop-config/ibus-bamboo/ibus-bamboous.macro.text" \
-    "$CONFIG_HOME/ibus-bamboo/ibus-bamboous.macro.text"
-
-  if $DRY_RUN; then
-    note "Load $REPO_DIR/desktop-config/ibus.dconf into /desktop/ibus/"
-  elif command -v dconf >/dev/null 2>&1; then
-    if ! dconf load /desktop/ibus/ < "$REPO_DIR/desktop-config/ibus.dconf"; then
-      note "Warning: IBus preferences could not be loaded outside a desktop D-Bus session."
-      note "Run this once after login: dconf load /desktop/ibus/ < '$REPO_DIR/desktop-config/ibus.dconf'"
-    fi
-  fi
+    "$REPO_DIR/desktop-config/fcitx5/conf/bamboo.conf" \
+    "$CONFIG_HOME/fcitx5/conf/bamboo.conf"
 }
 
 install_dms_config() {
@@ -256,16 +247,35 @@ install_system_integration() {
   run sudo install -m 0755 "$REPO_DIR/sessions/niri-session-dms" /usr/local/bin/niri-session-dms
   run sudo install -m 0644 "$REPO_DIR/sessions/niri-dms.desktop" /usr/share/wayland-sessions/niri-dms.desktop
 
-  log "Installing per-device Caps Lock/Escape swap"
-  if [[ -f "$keyd_target" ]] && cmp -s "$REPO_DIR/system/keyd/default.conf" "$keyd_target"; then
-    note "$keyd_target is already current"
-  else
-    if [[ -e "$keyd_target" ]]; then
-      run sudo cp -a -- "$keyd_target" "$keyd_target.niri-dotfiles.bak.$STAMP"
-    fi
-    run sudo install -m 0644 "$REPO_DIR/system/keyd/default.conf" "$keyd_target"
+  log "Retiring the former managed keyd swap"
+  # Only retire our exact old rule; preserve unrelated keyd configurations.
+  if [[ -f "$keyd_target" ]] && cmp -s "$keyd_target" <(printf '[ids]\n*\n-36ae:fe9c\n\n[main]\ncapslock = esc\nesc = capslock\n'); then
+    run sudo systemctl disable --now keyd
+    run sudo mv -- "$keyd_target" "$keyd_target.niri-dotfiles.bak.$STAMP"
   fi
-  run sudo systemctl enable --now keyd
+
+  log "Installing SDINNO keyboard chatter filter (40 ms)"
+  local source target mode
+  for source in chatter-filter-linux.py chatter-filter.service uinput.conf; do
+    case "$source" in
+      chatter-filter-linux.py) target=/usr/local/bin/chatter-filter-linux.py; mode=0755 ;;
+      chatter-filter.service) target=/etc/systemd/system/chatter-filter.service; mode=0644 ;;
+      uinput.conf) target=/etc/modules-load.d/chatter-filter-uinput.conf; mode=0644 ;;
+    esac
+    require_source "$REPO_DIR/system/chatter-filter/$source"
+    if [[ -f "$target" ]] && cmp -s "$REPO_DIR/system/chatter-filter/$source" "$target"; then
+      note "$target is already current"
+    else
+      if [[ -e "$target" ]]; then
+        run sudo cp -a -- "$target" "$target.niri-dotfiles.bak.$STAMP"
+      fi
+      run sudo install -m "$mode" "$REPO_DIR/system/chatter-filter/$source" "$target"
+    fi
+  done
+  run sudo modprobe uinput
+  run sudo systemctl daemon-reload
+  run sudo systemctl enable --now chatter-filter.service
+  run sudo systemctl restart chatter-filter.service
 
   log "Applying compact DMS workspace pills"
   if [[ ! -f "$dms_workspace" ]]; then

@@ -2,7 +2,7 @@
 
 This repository reproduces the two Niri sessions used on the source machine:
 
-- **Niri** — Waybar, Swaybg, Fuzzel, Xfce Terminal, lxpolkit, and IBus Bamboo.
+- **Niri** — Waybar, Swaybg, Fuzzel, Xfce Terminal, lxpolkit, and Fcitx 5 Bamboo.
 - **Niri (DMS)** — DankMaterialShell with the same Niri bindings, blue color family, wallpaper, input method, and compact bottom bar.
 
 The automated package bootstrap targets **Ubuntu 26.04 or newer**. The configuration layer can be installed on another distribution after its equivalent packages are installed.
@@ -42,8 +42,8 @@ The Ubuntu bootstrap installs:
 - Xfce Terminal
 - Swaybg and Swaylock
 - PipeWire/WirePlumber controls, Pavucontrol, brightness and power-profile tools
-- IBus with Bamboo Vietnamese input
-- keyd
+- Fcitx 5 with Bamboo Vietnamese input and GTK/Qt frontends
+- Python evdev for the SDINNO keyboard chatter filter
 - Noto, Font Awesome, and Iosevka Nerd Font Mono
 - XDG portals and Xwayland Satellite
 
@@ -56,8 +56,10 @@ The script then deploys:
 - the shared `wall-2.png` wallpaper;
 - the compact DMS bar with 16 px active and 12 px inactive workspace pills;
 - the Xfce Terminal navy palette, Iosevka font, compact tabs, and 120×30 default size;
-- IBus Bamboo/Telex with `Alt+Z` switching;
-- Caps Lock/Escape swapping through keyd, except for the SDINNO keyboard (`36ae:fe9c`).
+- Fcitx 5 Bamboo/Telex with `Alt+Z` switching;
+- native Wayland input for GTK 3/4, Fcitx modules for GTK on XWayland, a Wayland-first Qt 6 fallback, and Fcitx compatibility for Qt 5, SDL, and XWayland;
+- Caps Lock and Escape both send Escape through Niri's `caps:escape` option;
+- a 40 ms per-key chatter filter for the SDINNO keyboard (`36ae:fe9c`), started automatically at boot.
 
 ## Hardware-specific settings
 
@@ -72,7 +74,9 @@ output "HDMI-A-1" {
 
 Niri safely ignores an output block when that connector is absent, but a different monitor will use its own default mode. Run `niri msg outputs` and update the block if the new machine uses another connector or refresh rate.
 
-The keyd exclusion is tied to the SDINNO USB identifier. Use `sudo keyd monitor` if the excluded keyboard has a different identifier on another machine.
+The chatter filter targets USB device `36ae:fe9c` and waits when it is disconnected. It grabs that device and emits filtered input through a virtual keyboard. Repeated presses within 40 ms of release are suppressed; intentional taps within that window are suppressed too. Other keyboards are unaffected. To change the target or threshold, edit `system/chatter-filter/chatter-filter.service` and rerun setup. List devices with `sudo /usr/local/bin/chatter-filter-linux.py --list`; inspect activity with `journalctl -u chatter-filter.service`.
+
+Setup retires the exact old keyd swap rule installed by this repo, preserving it as a timestamped backup. Unrelated keyd configurations are preserved.
 
 ## Configuration ownership
 
@@ -83,7 +87,7 @@ These directories are symlinked directly to the clone:
 - `~/.config/fuzzel`
 - `~/.config/matugen`
 
-DMS, GTK, Xfce Terminal, IBus, keyd, session files, and the wallpaper are installed as generated or copied files because those applications may rewrite their state.
+DMS, GTK, Xfce Terminal, Fcitx 5, the chatter filter, session files, and the wallpaper are installed as generated or copied files.
 
 Fuzzel's generated Material palette lives at `~/.cache/niri-desktop/fuzzel-colors.ini`, so changing a DMS palette does not dirty the Git checkout or collide with Fuzzel's own cache file.
 

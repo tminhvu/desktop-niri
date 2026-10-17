@@ -3,5 +3,5 @@ include "base.kdl"
 
 spawn-at-startup "waybar"
 spawn-at-startup "lxpolkit"
-spawn-sh-at-startup "/usr/libexec/ibus-ui-gtk3 --enable-wayland-im --exec-daemon --daemon-args '--xim'"
+spawn-at-startup "fcitx5" "-d" "-r"
 spawn-sh-at-startup "swaybg -m fill -i ~/Pictures/wall-2.png"

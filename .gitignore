@@ -30,7 +30,7 @@
 
 !/desktop-config/
 !/desktop-config/xfce4-terminal.xml
-!/desktop-config/ibus.dconf
+!/desktop-config/gtkrc-2.0
 !/desktop-config/gtk-3.0/
 !/desktop-config/gtk-3.0/gtk.css
 !/desktop-config/gtk-3.0/settings.ini
@@ -38,18 +38,19 @@
 !/desktop-config/gtk-4.0/settings.ini
 !/desktop-config/fontconfig/
 !/desktop-config/fontconfig/20-no-embedded.conf
-!/desktop-config/ibus-bamboo/
-!/desktop-config/ibus-bamboo/ibus-bamboo.config.json
-!/desktop-config/ibus-bamboo/ibus-bamboo.macro.text
-!/desktop-config/ibus-bamboo/ibus-bamboous.macro.text
+!/desktop-config/fcitx5/
+!/desktop-config/fcitx5/config
+!/desktop-config/fcitx5/profile
+!/desktop-config/fcitx5/conf/
+!/desktop-config/fcitx5/conf/bamboo.conf
 
 !/sessions/
 !/sessions/niri-dms.desktop
 !/sessions/niri-session-dms
 
 !/system/
-!/system/keyd/
-!/system/keyd/default.conf
+!/system/chatter-filter/
+!/system/chatter-filter/*
 
 !/wallpapers/
 !/wallpapers/wall-2.png
