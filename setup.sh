@@ -161,7 +161,7 @@ install_packages() {
     wireplumber brightnessctl pavucontrol power-profiles-daemon network-manager-gnome \
     xfce4-terminal lxpolkit \
     fcitx5 fcitx5-bamboo fcitx5-frontend-all fcitx5-frontend-gtk2 fcitx5-config-qt \
-    python3-evdev fonts-noto fonts-noto-mono fonts-font-awesome
+    python3 python3-evdev libnotify-bin fonts-noto fonts-noto-mono fonts-font-awesome
 }
 
 install_iosevka_nerd_font() {
@@ -199,6 +199,8 @@ install_user_configs() {
   link_config_directory waybar
   link_config_directory fuzzel
   link_config_directory matugen
+  require_source "$REPO_DIR/niri/window-memory.py"
+  note "Window memory starts with either Niri session; saved rules in $CONFIG_HOME/niri-window-memory are preserved"
 
   log "Installing wallpaper and generated Fuzzel fallback"
   install_user_file "$REPO_DIR/wallpapers/wall-2.png" "$HOME/Pictures/wall-2.png"

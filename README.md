@@ -61,6 +61,19 @@ The script then deploys:
 - Caps Lock and Escape both send Escape through Niri's `caps:escape` option;
 - a 40 ms per-key chatter filter for the SDINNO keyboard (`36ae:fe9c`), started automatically at boot.
 
+## Remember a window's opening mode
+
+- `Super+S`: toggle floating for the current window.
+- `Super+Shift+Alt+S`: remember floating for a specific window title.
+- `Super+F`: toggle the current column's maximized width.
+- `Super+Shift+Alt+F`: remember full-width tiling for a specific window title (bar stays visible).
+
+Focus the popup or dialog, press the remember shortcut, and choose its exact title or a title pattern. Patterns accept `*` for any text and `?` for one character; other characters are literal. Every rule also requires the exact app ID, so a Chrome extension popup can be targeted without changing ordinary Chrome windows. Review the app ID, pattern and current match count, then select **Save preference**. Matching saved rules can be removed from the same picker. Escape cancels without saving.
+
+The watcher catches titles that appear after a window opens. Each preference is applied once per window; subsequent manual changes are respected. Remembered maximization sets the column to 100% width by window ID, keeping focus and the bar intact. This has the same full-width appearance as `Super+F`, but does not toggle Niri's internal maximized flag. Choosing a different mode for the same pattern replaces its previous mode; later overlapping rules take precedence. Removing a rule leaves existing windows as they are.
+
+Rules persist in `~/.config/niri-window-memory/rules.json`, shared by normal Niri and DMS. Setup preserves this folder. Copy it to another machine to transfer your saved preferences. The helper starts automatically in both sessions and uses only Python's standard library, Fuzzel and Niri IPC. Windows with identical app IDs and titles cannot be distinguished, and embedded browser popups that Niri does not expose as separate windows cannot be targeted.
+
 ## Hardware-specific settings
 
 The source display is configured in `niri/base.kdl` as:

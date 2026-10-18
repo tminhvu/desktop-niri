@@ -2,6 +2,7 @@
 // https://yalter.github.io/niri/Configuration:-Introduction
 // https://yalter.github.io/niri/Configuration:-Input
 prefer-no-csd
+spawn-sh-at-startup "exec python3 \"${XDG_CONFIG_HOME:-$HOME/.config}/niri/window-memory.py\" watch"
 environment {
     XMODIFIERS "@im=fcitx"
     QT_IM_MODULE "fcitx"
@@ -537,6 +538,7 @@ binds {
     //Mod+Shift+R { switch-preset-window-height; }
     //Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
+    Mod+Shift+Alt+F hotkey-overlay-title="Remember This Window Title: Maximized" { spawn-sh "exec python3 \"${XDG_CONFIG_HOME:-$HOME/.config}/niri/window-memory.py\" maximized"; }
     Mod+Alt+F hotkey-overlay-title="Fullscreen Focused Window" { fullscreen-window; }
     Mod+Shift+F hotkey-overlay-title="Screenshot: Full Screen" { screenshot-screen; }
 
@@ -566,6 +568,7 @@ binds {
 
     // Move the focused window between the floating and the tiling layout.
     Mod+S       { toggle-window-floating; }
+    Mod+Shift+Alt+S hotkey-overlay-title="Remember This Window Title: Floating" { spawn-sh "exec python3 \"${XDG_CONFIG_HOME:-$HOME/.config}/niri/window-memory.py\" floating"; }
     Mod+Alt+S hotkey-overlay-title="Switch Focus Between Floating and Tiling" { switch-focus-between-floating-and-tiling; }
     Mod+Shift+S hotkey-overlay-title="Screenshot: Select Area" { screenshot; }
 

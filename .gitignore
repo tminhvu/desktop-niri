@@ -8,6 +8,9 @@
 
 !/niri/
 !/niri/*.kdl
+!/niri/window-memory.py
+!/tests/
+!/tests/test_window_memory.py
 
 !/waybar/
 !/waybar/config.jsonc
