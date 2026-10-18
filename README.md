@@ -40,6 +40,8 @@ The Ubuntu bootstrap installs:
 - DankMaterialShell and Matugen
 - Waybar and Fuzzel
 - Xfce Terminal
+- Thunar as the default file manager for folders
+- mpv with an explicit `q` shortcut to quit
 - Swaybg and Swaylock
 - PipeWire/WirePlumber controls, Pavucontrol, brightness and power-profile tools
 - Fcitx 5 with Bamboo Vietnamese input and GTK/Qt frontends
@@ -68,9 +70,11 @@ The script then deploys:
 - `Super+F`: toggle the current column's maximized width.
 - `Super+Shift+Alt+F`: remember full-width tiling for a specific window title (bar stays visible).
 
-Focus the popup or dialog, press the remember shortcut, and choose its exact title or a title pattern. Patterns accept `*` for any text and `?` for one character; other characters are literal. Every rule also requires the exact app ID, so a Chrome extension popup can be targeted without changing ordinary Chrome windows. Review the app ID, pattern and current match count, then select **Save preference**. Matching saved rules can be removed from the same picker. Escape cancels without saving.
+Focus the popup or dialog, press the remember shortcut, and choose its exact title, a title pattern, or **All windows with this app ID**. Patterns accept `*` for any text and `?` for one character; other characters are literal. Title rules also require the exact app ID, so a Chrome extension popup can be targeted without changing ordinary Chrome windows. The app-ID-only option covers different titles from one component, such as a portal's Open/Save dialogs. It affects every window with that app ID, including any other dialogs or main windows; review the identity and current match count before selecting **Save preference**. Matching saved rules can be removed from the same picker. Escape cancels without saving.
 
-The watcher catches titles that appear after a window opens. Each preference is applied once per window; subsequent manual changes are respected. Remembered maximization sets the column to 100% width by window ID, keeping focus and the bar intact. This has the same full-width appearance as `Super+F`, but does not toggle Niri's internal maximized flag. Choosing a different mode for the same pattern replaces its previous mode; later overlapping rules take precedence. Removing a rule leaves existing windows as they are.
+Choose **Show / copy window details** to inspect every field Niri exposes for the original focused window and copy the complete JSON using `wl-copy` (installed by setup). The capture happens before Fuzzel takes focus. Details can include titles, app IDs, PIDs, workspace and layout information; review the contents before sharing. Window IDs identify current instances only and are not stable across reopening.
+
+The watcher catches titles that appear after a window opens. Each preference is applied once per window; subsequent manual changes are respected. Remembered maximization sets the column to 100% width by window ID, keeping focus and the bar intact. This has the same full-width appearance as `Super+F`, but does not toggle Niri's internal maximized flag. Choosing a different mode for the same match replaces its previous mode. Title-specific rules always override app-ID-only defaults; later overlapping rules of the same scope take precedence. Existing saved title rules remain compatible. Removing a rule leaves existing windows as they are unless another saved rule applies.
 
 Rules persist in `~/.config/niri-window-memory/rules.json`, shared by normal Niri and DMS. Setup preserves this folder. Copy it to another machine to transfer your saved preferences. The helper starts automatically in both sessions and uses only Python's standard library, Fuzzel and Niri IPC. Windows with identical app IDs and titles cannot be distinguished, and embedded browser popups that Niri does not expose as separate windows cannot be targeted.
 
@@ -101,6 +105,10 @@ These directories are symlinked directly to the clone:
 - `~/.config/matugen`
 
 DMS, GTK, Xfce Terminal, Fcitx 5, the chatter filter, session files, and the wallpaper are installed as generated or copied files.
+
+Setup copies `desktop-config/mpv/input.conf` to `~/.config/mpv/input.conf` and selects `thunar.desktop` for `inode/directory` using `xdg-mime`. Existing MIME preferences are backed up before updating the folder association; other file associations are preserved.
+
+Both Niri sessions select the GTK portal for Open/Save dialogs through `~/.config/xdg-desktop-portal/niri-portals.conf`, while retaining the GNOME portal for screen sharing. GTK 3/4 explicitly use the Adwaita icon theme, installed by setup, for consistent chooser icons. Thunar remains the folder handler; the GTK chooser is a separate dialog. Restart the portal services or log out and back in after changing portal preferences, and reopen application dialogs.
 
 Fuzzel's generated Material palette lives at `~/.cache/niri-desktop/fuzzel-colors.ini`, so changing a DMS palette does not dirty the Git checkout or collide with Fuzzel's own cache file.
 

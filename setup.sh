@@ -159,9 +159,9 @@ install_packages() {
     niri dms matugen waybar fuzzel swaybg swaylock xwayland-satellite \
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
     wireplumber brightnessctl pavucontrol power-profiles-daemon network-manager-gnome \
-    xfce4-terminal lxpolkit \
+    xfce4-terminal thunar mpv xdg-utils wl-clipboard lxpolkit \
     fcitx5 fcitx5-bamboo fcitx5-frontend-all fcitx5-frontend-gtk2 fcitx5-config-qt \
-    python3 python3-evdev libnotify-bin fonts-noto fonts-noto-mono fonts-font-awesome
+    python3 python3-evdev libnotify-bin adwaita-icon-theme fonts-noto fonts-noto-mono fonts-font-awesome
 }
 
 install_iosevka_nerd_font() {
@@ -202,6 +202,14 @@ install_user_configs() {
   require_source "$REPO_DIR/niri/window-memory.py"
   note "Window memory starts with either Niri session; saved rules in $CONFIG_HOME/niri-window-memory are preserved"
 
+  log "Installing mpv keyboard settings and selecting Thunar for folders"
+  install_user_file "$REPO_DIR/desktop-config/mpv/input.conf" "$CONFIG_HOME/mpv/input.conf"
+  if [[ -f "$CONFIG_HOME/mimeapps.list" ]]; then
+    run mkdir -p -- "$BACKUP_DIR"
+    run cp -a -- "$CONFIG_HOME/mimeapps.list" "$BACKUP_DIR/mimeapps.list"
+  fi
+  run xdg-mime default thunar.desktop inode/directory
+
   log "Installing wallpaper and generated Fuzzel fallback"
   install_user_file "$REPO_DIR/wallpapers/wall-2.png" "$HOME/Pictures/wall-2.png"
   if [[ ! -f "$CACHE_HOME/niri-desktop/fuzzel-colors.ini" ]]; then
@@ -218,6 +226,9 @@ install_user_configs() {
   install_user_file "$REPO_DIR/desktop-config/gtk-3.0/gtk.css" "$CONFIG_HOME/gtk-3.0/gtk.css"
   install_user_file "$REPO_DIR/desktop-config/gtk-3.0/settings.ini" "$CONFIG_HOME/gtk-3.0/settings.ini"
   install_user_file "$REPO_DIR/desktop-config/gtk-4.0/settings.ini" "$CONFIG_HOME/gtk-4.0/settings.ini"
+  install_user_file \
+    "$REPO_DIR/desktop-config/xdg-desktop-portal/niri-portals.conf" \
+    "$CONFIG_HOME/xdg-desktop-portal/niri-portals.conf"
   install_user_file \
     "$REPO_DIR/desktop-config/fontconfig/20-no-embedded.conf" \
     "$CONFIG_HOME/fontconfig/conf.d/20-no-embedded.conf"

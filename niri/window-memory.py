@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remember opening modes by app ID AND title, including late title changes."""
+"""Remember opening modes by title or explicit app-ID scope; inspect window JSON."""
 import argparse
 import fcntl
 import json
@@ -45,11 +45,16 @@ def load_rules():
     if not isinstance(rules, list):
         raise ValueError("Saved rules must be a list")
     for rule in rules:
-        if not rule.get("app_id") or not rule.get("title"):
-            raise ValueError("Every rule must match both an app ID and a nonempty title")
+        if not rule.get("app_id"):
+            raise ValueError("Every rule must match an app ID")
+        if rule.get("scope", "title") not in ("app", "title"):
+            raise ValueError("Unknown rule scope")
+        if rule.get("scope") != "app" and not rule.get("title"):
+            raise ValueError("Title rules require a nonempty title")
         if rule["mode"] not in ("floating", "maximized"):
             raise ValueError("Unknown saved mode")
-        re.compile(rule["title"])
+        if rule.get("scope") != "app":
+            re.compile(rule["title"])
     return rules
 
 
@@ -64,11 +69,33 @@ def save_rules(rules):
 
 
 def matching_rule(window, rules):
-    # Later rules override earlier rules, but never match an entire application.
-    for rule in reversed(rules):
-        if window.get("app_id") == rule["app_id"] and re.search(rule["title"], window.get("title") or ""):
-            return rule
+    # Specific title rules beat app-wide defaults, regardless of save order.
+    for app_scope in (False, True):
+        for rule in reversed(rules):
+            if (rule.get("scope") == "app") != app_scope:
+                continue
+            if window.get("app_id") == rule["app_id"] and (app_scope or re.search(rule["title"], window.get("title") or "")):
+                return rule
     return None
+
+
+def rule_key(rule):
+    return (rule["app_id"], rule.get("scope", "title"), rule.get("title"))
+
+
+def rule_label(rule):
+    return "All windows: " + rule["app_id"] if rule.get("scope") == "app" else rule["title"]
+
+
+def show_details(window):
+    # Preserve every IPC field, including new fields in later Niri versions.
+    payload = json.dumps(window, ensure_ascii=False, indent=2) + "\n"
+    entries = ["Copy full JSON to clipboard", "Close"] + payload.splitlines()
+    if menu("Window details: ", entries) == 0:
+        result = subprocess.run(["wl-copy", "--type", "text/plain;charset=utf-8"], input=payload, text=True)
+        if result.returncode:
+            raise RuntimeError("Could not copy window details to clipboard")
+        notify("Full window JSON copied. Paste it into the chat.")
 
 
 def notify(message):
@@ -106,8 +133,8 @@ def pattern_prompt(title):
 def remember(mode):
     # Capture before Fuzzel takes focus. Use the ID afterward, never the picker focus.
     window = request("FocusedWindow")["FocusedWindow"]
-    if not window or not window.get("app_id") or not window.get("title"):
-        raise ValueError("Focus a window with an app ID and a nonempty title first")
+    if not window:
+        raise ValueError("Focus a window first")
     folder = state_dir()
     folder.mkdir(parents=True, exist_ok=True)
     with (folder / "picker.lock").open("w") as picker_lock:
@@ -117,34 +144,46 @@ def remember(mode):
             return
         rules = load_rules()
         matches = [r for r in rules if matching_rule(window, [r])]
-        title = window["title"].replace("\n", " ")
-        choices = [f"Remember exact title: {title}", "Remember a title pattern (* and ? wildcards)"]
-        choices += [f"Remove {r['mode']} rule: {r['title']}" for r in matches]
-        choice = menu(f"{mode} · {window['app_id']}: ", choices)
+        title = (window.get("title") or "").replace("\n", " ")
+        choices = [f"Remember exact title: {title}", "Remember a title pattern (* and ? wildcards)", "All windows with this app ID", "Show / copy window details"]
+        choices += [f"Remove {r['mode']} rule: {rule_label(r)}" for r in matches]
+        choice = menu(f"{mode} · {window.get('app_id') or '(no app ID)'}: ", choices)
         if choice is None:
             return
-        if choice >= 2:
-            selected = matches[choice - 2]
-            if menu("Remove saved preference? ", ["Remove: " + selected["title"], "Cancel"]) != 0:
+        if choice == 3:
+            show_details(window)
+            return
+        if choice >= 4:
+            selected = matches[choice - 4]
+            if menu("Remove saved preference? ", ["Remove: " + rule_label(selected), "Cancel"]) != 0:
                 return
             with (folder / "rules.lock").open("w") as lock:
                 fcntl.flock(lock, fcntl.LOCK_EX)
                 save_rules([r for r in load_rules() if r != selected])
             notify("Preference removed. Existing windows keep their current mode.")
             return
-        pattern = "^" + re.escape(window["title"]) + "$" if choice == 0 else pattern_prompt(window["title"])
-        if pattern is None:
-            return
-        if not re.search(pattern, window["title"]):
-            raise ValueError("The pattern does not match the selected window")
-        rule = {"app_id": window["app_id"], "title": pattern, "mode": mode}
+        if not window.get("app_id"):
+            raise ValueError("This window has no app ID; use Show / copy window details")
+        if choice == 2:
+            rule = {"app_id": window["app_id"], "scope": "app", "mode": mode}
+        else:
+            if not window.get("title"):
+                raise ValueError("Title matching requires a nonempty window title")
+            pattern = "^" + re.escape(window["title"]) + "$" if choice == 0 else pattern_prompt(window["title"])
+            if pattern is None:
+                return
+            if not re.search(pattern, window["title"]):
+                raise ValueError("The pattern does not match the selected window")
+            rule = {"app_id": window["app_id"], "title": pattern, "mode": mode}
         count = sum(1 for w in windows() if matching_rule(w, [rule]))
-        confirmation = ["Save preference", "Cancel", f"App ID: {rule['app_id']}", f"Title: {pattern}", f"Currently matches {count} window(s)"]
+        confirmation = ["Save preference", "Cancel", f"App ID: {rule['app_id']}", "Match: " + rule_label(rule), f"Currently matches {count} window(s)"]
+        if choice == 2:
+            confirmation.append("Applies to EVERY window from this app ID, including other dialogs and main windows")
         if menu(f"Always open {mode}? ", confirmation) != 0:
             return
         with (folder / "rules.lock").open("w") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
-            updated = [r for r in load_rules() if (r["app_id"], r["title"]) != (rule["app_id"], pattern)]
+            updated = [r for r in load_rules() if rule_key(r) != rule_key(rule)]
             save_rules(updated + [rule])
         # The watcher applies the confirmed rule, including to this window.
         notify(f"Remembered {mode} for {title}")
@@ -163,7 +202,7 @@ class Watcher:
         if signature != self.signature:
             self.rules = load_rules()
             self.signature = signature
-            identities = {(r["app_id"], r["title"], r["mode"]) for r in self.rules}
+            identities = {rule_key(r) + (r["mode"],) for r in self.rules}
             self.applied = {key: value for key, value in self.applied.items() if value in identities}
             self.scan()
 
@@ -171,7 +210,7 @@ class Watcher:
         rule = matching_rule(window, self.rules)
         if not rule:
             return
-        identity = (rule["app_id"], rule["title"], rule["mode"])
+        identity = rule_key(rule) + (rule["mode"],)
         if self.applied.get(window["id"]) == identity:
             return
         # Record before sending actions: their own events must not reapply the rule.
