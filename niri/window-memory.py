@@ -90,7 +90,7 @@ def rule_label(rule):
 def show_details(window):
     # Preserve every IPC field, including new fields in later Niri versions.
     payload = json.dumps(window, ensure_ascii=False, indent=2) + "\n"
-    entries = ["Copy full JSON to clipboard", "Close"] + payload.splitlines()
+    entries = ["Copy full JSON to clipboard", "Cancel"] + payload.splitlines()
     if menu("Window details: ", entries) == 0:
         result = subprocess.run(["wl-copy", "--type", "text/plain;charset=utf-8"], input=payload, text=True)
         if result.returncode:
@@ -119,7 +119,7 @@ def menu(prompt, entries):
 def pattern_prompt(title):
     # Shell wildcards are easier to edit than regex; all other characters are literal.
     result = subprocess.run(
-        ["fuzzel", "--dmenu", "--lines=0", "--width=70", "--prompt", "Title (* = any text): ", "--search", title],
+        ["fuzzel", "--dmenu", "--lines=0", "--width=70", "--prompt", "Title (* = any text; Esc to cancel): ", "--search", title],
         input="", text=True, capture_output=True,
     )
     if result.returncode:
@@ -147,8 +147,9 @@ def remember(mode):
         title = (window.get("title") or "").replace("\n", " ")
         choices = [f"Remember exact title: {title}", "Remember a title pattern (* and ? wildcards)", "All windows with this app ID", "Show / copy window details"]
         choices += [f"Remove {r['mode']} rule: {rule_label(r)}" for r in matches]
+        choices.append("Cancel")
         choice = menu(f"{mode} · {window.get('app_id') or '(no app ID)'}: ", choices)
-        if choice is None:
+        if choice is None or choice == len(choices) - 1:
             return
         if choice == 3:
             show_details(window)

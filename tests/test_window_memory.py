@@ -111,6 +111,28 @@ class WindowMemoryTests(unittest.TestCase):
             memory.remember("floating")
         self.assertEqual(memory.load_rules(), [])
 
+    def test_visible_cancel_preserves_existing_rules(self):
+        memory.save_rules([self.rule])
+        def cancel(prompt, entries):
+            self.assertEqual(entries[-1], "Cancel")
+            return len(entries) - 1
+        with patch.object(memory, "request", return_value={"FocusedWindow": self.window}), patch.object(memory, "menu", side_effect=cancel), patch.object(memory, "action") as act:
+            memory.remember("floating")
+        self.assertEqual(memory.load_rules(), [self.rule])
+        act.assert_not_called()
+
+    def test_details_cancel_does_not_copy(self):
+        with patch.object(memory, "menu", return_value=1) as menu, patch.object(memory.subprocess, "run") as run:
+            memory.show_details(self.window)
+        self.assertEqual(menu.call_args.args[1][1], "Cancel")
+        run.assert_not_called()
+
+    def test_wildcard_escape_cancels(self):
+        with patch.object(memory.subprocess, "run") as run:
+            run.return_value.returncode = 1
+            self.assertIsNone(memory.pattern_prompt("Test window"))
+        self.assertIn("Esc to cancel", run.call_args.args[0][-3])
+
 
 if __name__ == "__main__":
     unittest.main()
